@@ -1,0 +1,43 @@
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+# java specific
+*.class
+
+# eclipse specific
+.metadata
+jrebel.lic
+.settings
+.classpath
+.project
+
+.ensime*
+*.sublime-*
+.cache
+.cache-*
+
+# intellij
+*.eml
+*.iml
+*.ipr
+*.iws
+.*.sw?
+.idea
+
+# paulp script
+/.lib/
+
+# maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties

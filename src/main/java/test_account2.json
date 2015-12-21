@@ -1,0 +1,13 @@
+{
+  "player": {
+    "id": "009",
+    "name": "Lars Droessler",
+    "uri": "/player/009",
+    "place": {
+      "name": "start"
+    },
+    "position": 0,
+    "ready": false
+  },
+  "saldo": 0
+}

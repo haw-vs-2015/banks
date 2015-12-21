@@ -1,0 +1,13 @@
+{
+  "player": {
+    "id": "007",
+    "name": "James Bond",
+    "uri": "/player/007",
+    "place": {
+      "name": "start"
+    },
+    "position": 0,
+    "ready": false
+  },
+  "saldo": 0
+}
