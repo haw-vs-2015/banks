@@ -1,20 +1,15 @@
 package bank;
 
 import bank.datatypes.*;
-import bank.utils.CommandAdapter;
-import bank.utils.HttpUtils;
-import bank.utils.LamportClock;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import bank.utils.*;
+import com.google.gson.*;
 import mfc.util.IPManager;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class BankService {
 
@@ -30,6 +25,52 @@ public class BankService {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Command.class, new CommandAdapter());
         gson = builder.create();
+
+        put("/banks/:gameid", (req, res) -> {
+            clock.tick();
+
+            String gameId = req.params(":gameid");
+
+            if (gameId.isEmpty()) {
+                res.status(400);
+
+                return "Malformed request";
+            }
+
+            if (!accounts.containsKey(gameId)) {
+                accounts.put(gameId, new HashMap<>());
+            }
+
+            if (!transfers.containsKey(gameId)) {
+                transfers.put(gameId, new HashMap<>());
+            }
+
+            res.status(200);
+            clock.tick();
+
+            return "";
+        });
+
+        get("/banks/:gameid", (req, res) -> {
+            clock.tick();
+
+            String gameId = req.params(":gameid");
+            Bank bank = new Bank();
+
+            if (gameId.isEmpty()) {
+                res.status(400);
+
+                return "Malformed request";
+            }
+
+            bank.setPlayers("http://" + IPManager.getInternetIP() + ":4567/banks/" + gameId + "/players");
+            bank.setTransfers("http://" + IPManager.getInternetIP() + ":4567/banks/" + gameId + "/transfers");
+
+            res.status(200);
+            clock.tick();
+
+            return new Gson().toJson(bank);
+        });
 
         post("/banks/:gameid/players", (req, res) -> {
             clock.tick();
@@ -134,6 +175,28 @@ public class BankService {
 
                 return "Player already got a bank account";
             }
+        });
+
+        get("/banks/:gameid/players", (req, res) -> {
+            clock.tick();
+
+            String gameId = req.params(":gameid");
+            Accounts accs = new Accounts();
+
+            if (gameId.isEmpty()) {
+                res.status(400);
+
+                return "Malformed request";
+            }
+
+            for (Map.Entry<String, Account> a : accounts.get(gameId).entrySet()) {
+                accs.getAccounts().add("http://" + IPManager.getInternetIP() + ":4567/banks/" + gameId + "/players/" + a.getKey());
+            }
+
+            res.status(200);
+            clock.tick();
+
+            return new Gson().toJson(accs);
         });
 
         get("/banks/:gameid/players/:playerid", (req, res) -> {
@@ -493,6 +556,28 @@ public class BankService {
             clock.tick();
 
             return new Gson().toJson(events);
+        });
+
+        get("/banks/:gameid/transfers", (req, res) -> {
+            clock.tick();
+
+            String gameId = req.params(":gameid");
+            Transfers transfs = new Transfers();
+
+            if (gameId.isEmpty()) {
+                res.status(400);
+
+                return "Malformed request";
+            }
+
+            for (Map.Entry<String, Transfer> a : transfers.get(gameId).entrySet()) {
+                transfs.getTransfers().add("http://" + IPManager.getInternetIP() + ":4567/banks/" + gameId + "/transfers/" + a.getKey());
+            }
+
+            res.status(200);
+            clock.tick();
+
+            return new Gson().toJson(transfs);
         });
 
         get("/banks/:gameid/transfers/:transferid", (req, res) -> {
